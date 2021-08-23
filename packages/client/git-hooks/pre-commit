@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# could be anything we want
+npm run lint
+tsc --noEmit
+npm test
