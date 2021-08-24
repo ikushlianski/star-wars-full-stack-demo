@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# checks types
+tsc --noEmit
+
+# runs all tests in all packages
+lerna run test
+
+# ...could be anything we want
