@@ -2,6 +2,7 @@ import axios from 'axios';
 import { ApiResponse } from '../contracts/api-response';
 import { Person } from '../contracts/person';
 import RedisClient, { Redis } from 'ioredis';
+import { Collection } from '../express-app/enums/collection';
 
 class SWApiWorker {
   // hardcoded for simplicity. We could fetch API's "pages" in batches of 5-10 and look at "next" link in each result to see whether we should stop
@@ -20,17 +21,7 @@ class SWApiWorker {
     const rawResponses = await this.fetchData(pageUrls);
     const peopleToSave = this.extractPersons(rawResponses);
 
-    const peopleSavePromises = peopleToSave.map((person) => {
-      return this.redis.zadd(
-        'byAge',
-        -parseInt(person.birth_year) || 0,
-        JSON.stringify(person),
-      );
-    });
-
-    // todo add another set sorted by name
-
-    await Promise.all(peopleSavePromises);
+    await this.savePeople(peopleToSave);
   };
 
   private getPageUrls = (): string[] => {
@@ -77,6 +68,29 @@ class SWApiWorker {
       return people;
     }, []);
   };
+
+  private savePeople = async (peopleToSave: Person[]) => {
+    const byAgeSavePromises = peopleToSave.map((person) => {
+      return this.redis.zadd(
+        Collection.ByAge,
+        parseInt(person.birth_year) || 0,
+        JSON.stringify(person),
+      );
+    });
+
+    const byNameSavePromises = peopleToSave.map((person) => {
+      return this.redis.zadd(
+        Collection.ByName,
+        0, // same score for all, so sort lexicographically
+        JSON.stringify({
+          sort_col: person.name, // comes first in the JSON string - responsible for sorting records by name
+          ...person,
+        }),
+      );
+    });
+
+    await Promise.all([...byAgeSavePromises, ...byNameSavePromises]);
+  };
 }
 
 export const worker = new SWApiWorker();
@@ -87,4 +101,11 @@ worker
   .then(() => {
     console.log('worker finished running');
   })
-  .catch((error) => console.error(error));
+  .catch((error) => {
+    console.error(error);
+
+    process.exit(1);
+  })
+  .finally(() => {
+    process.exit();
+  });
