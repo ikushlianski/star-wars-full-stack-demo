@@ -5,6 +5,7 @@
     "postinstall": "./git-hooks/setup-hooks.sh"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@typescript-eslint/eslint-plugin": "4.29.3",
     "@typescript-eslint/parser": "4.29.3",
     "eslint": "7.32.0",

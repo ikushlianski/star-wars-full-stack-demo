@@ -4,6 +4,10 @@
 - have lerna installed globally `npm i -g lerna` or use `npx`
 - install all dependencies `npx lerna bootstrap`
 - from the root, run `npm i` to install some common dev packages and also set up git hooks automatically
+- create `.env` file in each package, based on the package's `.env.example` file
+- to launch the api and client, run `npm start` in each application
+
+## Working with Lerna and packages
 - add new packages with `npx lerna create <package-name>`
 - to install a local dependency specifically for one package, run `npx lerna add --scope=<your-package> <package-name>`
 
