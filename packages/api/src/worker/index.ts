@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { ApiResponse } from '../contracts/api-response';
 import { Person } from '../contracts/person';
@@ -17,6 +18,8 @@ class SWApiWorker {
   }
 
   public run = async () => {
+    await this.redis.flushall();
+
     const pageUrls = this.getPageUrls();
     const rawResponses = await this.fetchData(pageUrls);
     const peopleToSave = this.extractPersons(rawResponses);
@@ -53,12 +56,14 @@ class SWApiWorker {
     return rawResponses.reduce((people: Person[], apiResponse) => {
       const { results } = apiResponse;
       const persons: Person[] = results.map(
-        ({ name, height, mass, birth_year }) => {
+        ({ name, height, mass, birth_year, species }: Person) => {
           return {
+            id: uuidv4(),
             name,
             height,
             mass,
             birth_year,
+            species,
           };
         },
       );
@@ -70,11 +75,19 @@ class SWApiWorker {
   };
 
   private savePeople = async (peopleToSave: Person[]) => {
+    const byIdSavePromises = peopleToSave.map((person) => {
+      return this.redis.hset(
+        Collection.ById,
+        person.id,
+        JSON.stringify(person),
+      );
+    });
+
     const byAgeSavePromises = peopleToSave.map((person) => {
       return this.redis.zadd(
         Collection.ByAge,
         parseInt(person.birth_year) || 0,
-        JSON.stringify(person),
+        person.id,
       );
     });
 
@@ -84,12 +97,16 @@ class SWApiWorker {
         0, // same score for all, so sort lexicographically
         JSON.stringify({
           sort_col: person.name, // comes first in the JSON string - responsible for sorting records by name
-          ...person,
+          id: person.id,
         }),
       );
     });
 
-    await Promise.all([...byAgeSavePromises, ...byNameSavePromises]);
+    await Promise.all([
+      ...byIdSavePromises,
+      ...byAgeSavePromises,
+      ...byNameSavePromises,
+    ]);
   };
 }
 

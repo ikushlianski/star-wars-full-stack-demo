@@ -1,8 +1,10 @@
 export interface Person {
+  id: string;
   name: string;
   height: string;
   mass: string;
   birth_year: string;
+  species: string[];
 }
 
 export interface RawPerson extends Person {
@@ -12,7 +14,6 @@ export interface RawPerson extends Person {
   gender: string;
   homeworld: string;
   films: string[];
-  species: string[];
   vehicles: string[];
   starships: string[];
   created: string;
