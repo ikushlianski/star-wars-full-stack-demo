@@ -7,25 +7,18 @@ export const getPeopleController = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
-  const PEOPLE_BY_PAGE = 10;
-
   const {
     sortBy = SortBy.Name,
     sortDir = SortDir.ASC,
-    limit = PEOPLE_BY_PAGE,
+    limit,
     offset = 0,
   } = req.query;
-
-  console.log('sortBy', sortBy);
-  console.log('sortDir', sortDir);
-  console.log('limit', limit);
-  console.log('offset', offset);
 
   const result = await peopleService.getPersonsList(
     sortBy as SortBy,
     sortDir as SortDir,
     Number(offset),
-    limit as number,
+    Number(limit),
   );
 
   return res.send(result);

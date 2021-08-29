@@ -42,3 +42,23 @@ export const fetchPerson = createAsyncThunk<
     });
   }
 });
+
+export const fetchPeopleTotalCount = createAsyncThunk<
+  PeopleState,
+  undefined,
+  {
+    rejectValue: PeopleState;
+  }
+>('people/getCount', async (payload, { rejectWithValue }) => {
+  try {
+    return await peopleApiService.getTotalCount();
+  } catch (error) {
+    return rejectWithValue({
+      loaded: true,
+      loading: false,
+      error: error.message || 'Failed to get people count',
+      raw: [],
+      list: {},
+    });
+  }
+});

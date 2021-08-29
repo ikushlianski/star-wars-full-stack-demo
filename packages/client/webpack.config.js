@@ -8,6 +8,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'index-[contenthash].js',
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -32,4 +33,7 @@ module.exports = {
     }),
   ],
   devtool: 'source-map',
+  devServer: {
+    historyApiFallback: true,
+  },
 };

@@ -16,6 +16,8 @@ class PeopleService {
     offset: number,
     limit: number,
   ): Promise<(string | null)[]> {
+    limit -= 1; // redis hash begins with 0, while UI pagination with 1
+
     if (sortBy === SortBy.Age) {
       const idsByAge =
         sortDir === SortDir.ASC
@@ -29,10 +31,17 @@ class PeopleService {
       return this.fetchByIds(idsByAge);
     }
 
-    const idsByName =
+    const objectsByName =
       sortDir === SortDir.ASC
         ? await this.redis.zrange(Collection.ByName, offset, offset + limit)
         : await this.redis.zrevrange(Collection.ByName, offset, offset + limit);
+
+    const idsByName = objectsByName.reduce((acc: string[], cur) => {
+      const personWithId = JSON.parse(cur);
+      acc.push(personWithId.id);
+
+      return acc;
+    }, []);
 
     return this.fetchByIds(idsByName);
   }
@@ -49,6 +58,14 @@ class PeopleService {
     return jsonResults.map((json) => {
       return json ? JSON.parse(json) : json;
     });
+  }
+
+  async getPersonsCount() {
+    const count = await this.redis.hlen(Collection.ById);
+
+    console.debug('count', count);
+
+    return count;
   }
 }
 

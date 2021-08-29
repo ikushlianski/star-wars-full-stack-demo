@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { peopleReducer } from '../../entities/people/store/reducer';
-import { speciesReducer } from '../../entities/species/store/reducer';
 
 export const store = configureStore({
   reducer: {
@@ -8,3 +7,5 @@ export const store = configureStore({
     // species: speciesReducer,
   },
 });
+
+export type ApplicationState = ReturnType<typeof store.getState>;

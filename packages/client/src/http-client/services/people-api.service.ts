@@ -1,6 +1,6 @@
 import { client } from '../http-client';
 import { PeopleState, PersonState } from '../../entities/people/store/reducer';
-import { Person, RawPerson } from '../../contracts/person';
+import { Person } from '../../contracts/person';
 import { PeopleReqQueryParams } from '../../contracts/people-req-query-params';
 
 export const peopleApiService = {
@@ -19,7 +19,7 @@ export const peopleApiService = {
       }).toString();
 
       const url = `/people?${searchParams}`;
-      const result = await client<RawPerson[]>({
+      const result = await client<Person[]>({
         url,
         method: 'GET',
       });
@@ -45,7 +45,7 @@ export const peopleApiService = {
   getPerson: async function (id: string): Promise<PersonState> {
     try {
       const url = `/people/${id}`;
-      const result = await client<Person>({
+      const result = await client<Person[]>({
         url,
         method: 'GET',
       });
@@ -54,7 +54,7 @@ export const peopleApiService = {
         loaded: true,
         loading: false,
         error: undefined,
-        person: result.data,
+        person: result.data[0],
       };
     } catch (e) {
       return {
@@ -62,6 +62,34 @@ export const peopleApiService = {
         loading: false,
         error: new Error('Could not fetch person'),
         person: undefined,
+      };
+    }
+  },
+
+  getTotalCount: async function (): Promise<PeopleState> {
+    try {
+      const url = `/people/count`;
+      const result = await client<number>({
+        url,
+        method: 'GET',
+      });
+
+      return {
+        loaded: true,
+        loading: false,
+        error: undefined,
+        totalCount: result.data,
+        raw: [],
+        list: {},
+      };
+    } catch (e) {
+      return {
+        loaded: true,
+        loading: false,
+        error: new Error('Could not fetch persons count'),
+        list: {},
+        raw: [],
+        totalCount: undefined,
       };
     }
   },
