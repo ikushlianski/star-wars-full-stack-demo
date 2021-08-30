@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPeopleChunk, getPeopleCount } from '../store/selectors';
-import { Pagination } from '../components/pagination';
+import { PaginationComponent } from '../components/pagination';
 import { fetchPeople, fetchPeopleTotalCount } from '../store/action';
 import { SortBy } from '../../../contracts/sort-by';
 import { SortDir } from '../../../contracts/sort-dir';
-import { Table } from '../components/table';
+import { TableComponent } from '../components/table';
+import { Paper, TableContainer } from '@material-ui/core';
 
 export const PeopleList = () => {
   const limit = 10;
@@ -48,16 +49,18 @@ export const PeopleList = () => {
 
   return (
     <div>
-      <Table
-        peopleForPage={peopleForPage}
-        sortDir={sortDir}
-        sortBy={sortBy}
-        setSortBy={handleSetSortBy}
-        setSortDir={handleSetSortDir}
-      />
+      <TableContainer component={Paper}>
+        <TableComponent
+          peopleForPage={peopleForPage}
+          sortDir={sortDir}
+          sortBy={sortBy}
+          setSortBy={handleSetSortBy}
+          setSortDir={handleSetSortDir}
+        />
+      </TableContainer>
 
       {peopleCount !== undefined && (
-        <Pagination
+        <PaginationComponent
           page={page}
           limit={limit}
           onChange={onPageChange}

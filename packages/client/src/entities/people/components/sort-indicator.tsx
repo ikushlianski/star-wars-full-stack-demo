@@ -2,6 +2,8 @@ import React from 'react';
 import { SortDir } from '../../../contracts/sort-dir';
 import { SortBy } from '../../../contracts/sort-by';
 
+import './sort-indicator.css';
+
 interface Props {
   id: SortBy;
   sortingIsBy: SortBy;

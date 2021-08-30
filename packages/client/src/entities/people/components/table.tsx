@@ -5,6 +5,15 @@ import { SortBy } from '../../../contracts/sort-by';
 import { Person } from '../../../contracts/person';
 import { SortDir } from '../../../contracts/sort-dir';
 import { invertSorting } from '../../../helpers/invert-sorting';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@material-ui/core';
+
+import './table.css';
 
 interface Props {
   peopleForPage: Person[];
@@ -14,7 +23,7 @@ interface Props {
   setSortDir: (sortDir: SortDir) => void;
 }
 
-export const Table: React.FC<Props> = ({
+export const TableComponent: React.FC<Props> = ({
   peopleForPage,
   sortDir,
   sortBy,
@@ -30,39 +39,47 @@ export const Table: React.FC<Props> = ({
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th onClick={handleClick(SortBy.Name)}>
+    <Table
+      style={{ tableLayout: 'fixed' }}
+      size="small"
+      className="PeopleTable"
+    >
+      <TableHead>
+        <TableRow>
+          <TableCell
+            className="PeopleTable__HeaderCell"
+            onClick={handleClick(SortBy.Name)}
+          >
             Name
             <SortIndicator
               id={SortBy.Name}
               sortingIsBy={sortBy}
               sortDir={sortDir}
             />
-          </th>
-          <th onClick={handleClick(SortBy.Age)}>
+          </TableCell>
+          <TableCell
+            className="PeopleTable__HeaderCell"
+            onClick={handleClick(SortBy.Age)}
+          >
             Age
             <SortIndicator
               id={SortBy.Age}
               sortingIsBy={sortBy}
               sortDir={sortDir}
             />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {peopleForPage.map((person: Person) => {
-          return (
-            <tr key={person.name}>
-              <td>
-                <Link to={`/people/${person.id}`}>{person.name}</Link>
-              </td>
-              <td>{person.birth_year}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          </TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {peopleForPage.map((person: Person) => (
+          <TableRow key={person.name}>
+            <TableCell>
+              <Link to={`/people/${person.id}`}>{person.name}</Link>
+            </TableCell>
+            <TableCell>{person.birth_year}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };

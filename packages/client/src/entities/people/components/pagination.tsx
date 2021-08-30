@@ -1,4 +1,5 @@
 import React from 'react';
+import './pagination.css';
 
 interface Props {
   page: number;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 // let's make it very simple
-export const Pagination: React.FC<Props> = ({
+export const PaginationComponent: React.FC<Props> = ({
   page,
   limit,
   totalItems,
@@ -23,11 +24,15 @@ export const Pagination: React.FC<Props> = ({
 
   return (
     <div className="Pagination">
-      <ul>
+      <ul className="Pagination__List">
         {pages.map((currPage) => {
           const pageToRender = currPage + 1;
           return (
-            <li key={pageToRender} onClick={() => onChange(currPage)}>
+            <li
+              className="Pagination__ListItem"
+              key={pageToRender}
+              onClick={() => onChange(currPage)}
+            >
               {isActive(currPage) ? <b>{pageToRender}</b> : pageToRender}
             </li>
           );

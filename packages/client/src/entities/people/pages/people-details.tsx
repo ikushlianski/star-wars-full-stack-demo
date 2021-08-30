@@ -2,7 +2,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchPerson } from '../store/action';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { getPeopleChunk } from '../store/selectors';
+import { getLoadingState, getPeopleChunk } from '../store/selectors';
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CircularProgress,
+  Typography,
+} from '@material-ui/core';
+
+import './person-details.css';
 
 export const PeopleDetails = () => {
   const dispatch = useDispatch();
@@ -11,28 +21,35 @@ export const PeopleDetails = () => {
   } = useRouteMatch<{ personId: string }>();
   const history = useHistory();
 
+  const loading = useSelector(getLoadingState);
   const [person] = useSelector(getPeopleChunk);
 
   useEffect(() => {
     dispatch(fetchPerson(personId));
   }, [dispatch, personId]);
 
-  return (
-    <>
-      {person ? (
-        <div className="PersonDetails">
-          <h1>{person.name}</h1>
-          <div>Birth year: {person.birth_year}</div>
-          <div>Mass: {person.mass}</div>
-          <div>Height: {person.height}</div>
-          <div>Species: {person.species || 'unknown'}</div>
-        </div>
-      ) : (
-        'No person details found'
-      )}
-
-      <hr />
-      <button onClick={history.goBack}>Go back</button>
-    </>
+  return loading ? (
+    <CircularProgress className="PersonDetails__Progress" />
+  ) : (
+    <Card elevation={1}>
+      <CardContent className="PersonDetails">
+        {person ? (
+          <>
+            <Typography variant="h2">{person.name}</Typography>
+            <Typography>Birth year: {person.birth_year}</Typography>
+            <Typography>Mass: {person.mass}</Typography>
+            <Typography>Height: {person.height}</Typography>
+            <Typography>Species: {person.species || 'unknown'}</Typography>
+          </>
+        ) : (
+          <Typography>No person details found</Typography>
+        )}
+      </CardContent>
+      <CardActions>
+        <Button onClick={history.goBack} size="small">
+          Go back
+        </Button>
+      </CardActions>
+    </Card>
   );
 };

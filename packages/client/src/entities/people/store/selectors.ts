@@ -8,3 +8,7 @@ export const getPeopleChunk = (state: ApplicationState): Person[] => {
 export const getPeopleCount = (state: ApplicationState): number => {
   return state.people.totalCount || 0;
 };
+
+export const getLoadingState = (state: ApplicationState): boolean => {
+  return state.people.loading;
+};
