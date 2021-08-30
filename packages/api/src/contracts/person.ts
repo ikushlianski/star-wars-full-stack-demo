@@ -4,7 +4,7 @@ export interface Person {
   height: string;
   mass: string;
   birth_year: string;
-  species: string[];
+  species: string;
 }
 
 export interface RawPerson extends Person {
@@ -19,4 +19,11 @@ export interface RawPerson extends Person {
   created: string;
   edited: string;
   url: string;
+}
+
+export interface PersonsResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: RawPerson[];
 }

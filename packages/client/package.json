@@ -39,6 +39,7 @@
     "webpack-dev-server": "^4.0.0"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.3",
     "@reduxjs/toolkit": "^1.6.1",
     "axios": "^0.21.1",
     "core-js": "^3.16.3",

@@ -25,14 +25,14 @@ export const PeopleDetails = () => {
           <div>Birth year: {person.birth_year}</div>
           <div>Mass: {person.mass}</div>
           <div>Height: {person.height}</div>
-          {/*<div>Species: ${species }</div>*/}
+          <div>Species: {person.species || 'unknown'}</div>
         </div>
       ) : (
         'No person details found'
       )}
 
       <hr />
-      <button onClick={() => history.goBack()}>Go back</button>
+      <button onClick={history.goBack}>Go back</button>
     </>
   );
 };
