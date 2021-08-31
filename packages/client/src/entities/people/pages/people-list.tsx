@@ -13,9 +13,12 @@ import { getQueryVariable } from '../../../helpers/querystring';
 
 export const PeopleList: React.FC = () => {
   const limit = 10;
-  const [page, setPage] = useState(0);
-  const [sortDir, setSortDir] = useState<SortDir>(SortDir.DESC);
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.Age);
+  const savedQs = localStorage.getItem('SearchQuery');
+  const savedPage = Number(savedQs?.split('page=')[1][0]);
+
+  const [page, setPage] = useState(savedPage || 0);
+  const [sortDir, setSortDir] = useState(SortDir.DESC);
+  const [sortBy, setSortBy] = useState(SortBy.Age);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -71,11 +74,11 @@ export const PeopleList: React.FC = () => {
   };
 
   useEffect(() => {
-    const qs = localStorage.getItem('SearchQuery');
+    const searchQueryStored = localStorage.getItem('SearchQuery');
 
     const param = new URLSearchParams();
 
-    if (!qs) {
+    if (!searchQueryStored) {
       param.set('page', '0');
       param.set('sortBy', SortBy.Age);
       param.set('sortDir', SortDir.DESC);
@@ -90,22 +93,26 @@ export const PeopleList: React.FC = () => {
       setPage(Number(getQueryVariable('page')));
       setSortDir(getQueryVariable('sortDir') as SortDir);
       setSortBy(getQueryVariable('sortBy') as SortBy);
-
-      history.push({ search: qs });
     }
   }, [history]);
 
   useEffect(() => {
-    dispatch(
-      fetchPeople({
-        sortBy,
-        sortDir,
-        offset: page * limit,
-        limit,
-      }),
-    );
+    const pageInUrlQs = Number(getQueryVariable('page'));
+    const savedQs = localStorage.getItem('SearchQuery');
+    const savedPage = Number(savedQs?.split('page=')[1][0]);
 
-    dispatch(fetchPeopleTotalCount());
+    if (!savedQs || pageInUrlQs === savedPage) {
+      dispatch(
+        fetchPeople({
+          sortBy,
+          sortDir,
+          offset: page * limit,
+          limit,
+        }),
+      );
+
+      dispatch(fetchPeopleTotalCount());
+    }
   }, [dispatch, page, sortBy, sortDir]);
 
   return (
